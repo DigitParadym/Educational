@@ -11,7 +11,6 @@ import os
 from pathlib import Path
 import datetime
 import tkinter as tk
-from tkinter import filedialog
 from tkinter import ttk, filedialog, messagebox
 
 # Ajouter le repertoire parent au path pour les imports
@@ -39,49 +38,48 @@ class InterfaceAST:
         self.fichiers_selectionnes = []
         self.orchestrateur = None
         self.transformations_disponibles = []
-        self.transformations_json = []
         
         self.creer_interface()
         self.init_moteur_modulaire()
     
     def init_moteur_modulaire(self):
         """Initialise le moteur AST avec système modulaire - Version Corrigée."""
-        try:
-            # Import direct local
-            import sys
-            import os
-            from pathlib import Path
+    try:
+        # Import direct local
+        import sys
+        import os
+        from pathlib import Path
             
-            # Ajouter le répertoire parent au path
-            current_dir = Path(__file__).parent.parent
-            sys.path.insert(0, str(current_dir))
+        # Ajouter le répertoire parent au path
+        current_dir = Path(__file__).parent.parent
+        sys.path.insert(0, str(current_dir))
             
-            # Import direct du moteur
-            from modificateur_interactif import OrchestrateurAST
+        # Import direct du moteur
+        from modificateur_interactif import OrchestrateurAST
             
-            # Créer l'instance
-            self.orchestrateur = OrchestrateurAST()
+        # Créer l'instance
+        self.orchestrateur = OrchestrateurAST()
             
-            # Tester les transformations
-            self.transformations_disponibles = self.orchestrateur.lister_transformations_modulaires()
+        # Tester les transformations
+        self.transformations_disponibles = self.orchestrateur.lister_transformations_modulaires()
             
-            # Messages de debug
-            self.log_message(f"+ Moteur modulaire connecté avec succès!")
-            self.log_message(f"+ {len(self.transformations_disponibles)} transformation(s) trouvée(s)")
+        # Messages de debug
+        self.log_message(f"+ Moteur modulaire connecté avec succès!")
+        self.log_message(f"+ {len(self.transformations_disponibles)} transformation(s) trouvée(s)")
             
-            # Lister les transformations trouvées
-            for t in self.transformations_disponibles:
-                self.log_message(f"  - {t['display_name']} v{t.get('version', 'N/A')}")
+        # Lister les transformations trouvées
+        for t in self.transformations_disponibles:
+            self.log_message(f"  - {t['display_name']} v{t.get('version', 'N/A')}")
             
-            # FORCER la mise à jour de la liste déroulante
-            self.root.after(100, self.update_transformations_list)
+        # FORCER la mise à jour de la liste déroulante
+        self.root.after(100, self.update_transformations_list)
             
-        except Exception as e:
-            self.log_message(f"X Erreur connexion moteur: {e}")
-            import traceback
-            self.log_message(f"X Détails: {traceback.format_exc()}")
-            self.orchestrateur = None
-            self.transformations_disponibles = []
+    except Exception as e:
+        self.log_message(f"X Erreur connexion moteur: {e}")
+        import traceback
+        self.log_message(f"X Détails: {traceback.format_exc()}")
+        self.orchestrateur = None
+        self.transformations_disponibles = []
     def creer_interface(self):
         """Cree l'interface utilisateur."""
         # Frame principal
@@ -104,8 +102,7 @@ class InterfaceAST:
         tk.Button(buttons_frame, text="Selectionner Dossier",
                  command=self.select_folder).pack(side='left', padx=(0, 10))
         tk.Button(buttons_frame, text="Effacer",
-                 command=self.clear_selection).pack(side='left', padx=(0, 10))
-        tk.Button(buttons_frame, text="JSON", command=self.load_json_transformation).pack(side='left')
+                 command=self.clear_selection).pack(side='left')
         
         self.files_listbox = tk.Listbox(files_frame, height=4)
         self.files_listbox.pack(fill='x', padx=10, pady=(0, 10))
@@ -172,45 +169,6 @@ class InterfaceAST:
         self.update_files_display()
         self.log_message("+ Selection effacee")
     
-
-    def load_json_transformation(self):
-        """Charge une transformation depuis un fichier JSON."""
-        import json
-        try:
-            fichier_json = filedialog.askopenfilename(
-                title="Selectionner transformation JSON",
-                filetypes=[("Fichiers JSON", "*.json"), ("Tous", "*.*")]
-            )
-            
-            if not fichier_json:
-                return
-            
-            with open(fichier_json, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            # Verifier les cles requises
-            required = ['name', 'display_name', 'description']
-            if not all(key in data for key in required):
-                self.log_message("ERREUR - JSON invalide")
-                return
-            
-            # Ajouter aux transformations
-            if not hasattr(self, 'transformations_json'):
-                self.transformations_json = []
-            
-            self.transformations_json.append(data)
-            
-            if not self.transformations_disponibles:
-                self.transformations_disponibles = []
-            
-            self.transformations_disponibles.append(data)
-            self.update_transformations_list()
-            
-            self.log_message(f"JSON charge: {data['display_name']}")
-            
-        except Exception as e:
-            self.log_message(f"ERREUR JSON: {e}")
-
     def update_files_display(self):
         """Met a jour l'affichage des fichiers."""
         self.files_listbox.delete(0, tk.END)
