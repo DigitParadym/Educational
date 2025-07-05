@@ -8,11 +8,12 @@ Convertit les appels print() en logging.info() et ajoute l'import necessaire
 
 import ast
 from typing import Dict, Any, List
-from ..base_transformer import BaseTransformer
+from base_transformer import BaseTransformer
+from core.base_transformer import BaseTransformer
 
-class PrintToLoggingTransformer(BaseTransformer):
+class PrintToLoggingTransform(BaseTransformer):
     """
-    Transformation pour convertir les appels print() en logging.info().
+    Transformer pour convertir les appels print() en logging.info().
     Plugin respectant le contrat BaseTransformer avec ABC.
     """
 

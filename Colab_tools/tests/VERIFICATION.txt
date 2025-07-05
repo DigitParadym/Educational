@@ -1,0 +1,41 @@
+VERIFICATION DE LA STRUCTURE
+===========================
+
+Dossiers crees:
+- tests/scripts/unittests/
+- tests/scripts/integration/
+- tests/scripts/performance/
+- tests/data/input/
+- tests/data/expected/
+- tests/data/json_configs/
+- tests/data/invalid/
+- tests/output/transformations/
+- tests/output/reports/
+- tests/output/logs/
+- tests/config/environments/
+- tests/config/fixtures/
+
+Fichiers crees:
+- tests/data/input/simple_example.py
+- tests/data/input/no_docstrings.py
+- tests/data/json_configs/simple_transform.json
+- tests/data/invalid/syntax_error.py
+- tests/scripts/unittests/test_base.py
+- tests/run_tests.py
+- tests/README.md
+- tests/QUICKSTART.txt
+- tests/config/test_settings.json
+
+Scripts utilitaires:
+- tests/scripts/cleanup.py
+- tests/scripts/generate_basic_report.py
+- tests/scripts/test_specific.py
+
+PROCHAINES ETAPES:
+1. python tests/run_tests.py --auto
+2. python tests/scripts/test_specific.py
+3. python tests/scripts/generate_basic_report.py
+
+AIDE:
+- Voir README.md pour documentation complete
+- Voir QUICKSTART.txt pour demarrage rapide

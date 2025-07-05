@@ -1,0 +1,16 @@
+{
+  "name": "add_docstrings_test",
+  "display_name": "Ajouter Docstrings (Test)",
+  "description": "Ajoute des docstrings automatiquement aux fonctions sans documentation",
+  "version": "1.0.0",
+  "author": "Test Suite",
+  "category": "documentation",
+  "instructions": {
+    "add_docstrings": {
+      "functions": "\"\"\"Fonction generee automatiquement.\"\"\"",
+      "classes": "\"\"\"Classe generee automatiquement.\"\"\"",
+      "methods": "\"\"\"Methode generee automatiquement.\"\"\""
+    },
+    "skip_if_exists": true
+  }
+}

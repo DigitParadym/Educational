@@ -1,0 +1,29 @@
+GUIDE DE DEMARRAGE RAPIDE
+========================
+
+1. VERIFICATION RAPIDE
+   python tests/run_tests.py --auto
+
+2. MENU INTERACTIF
+   python tests/run_tests.py
+
+3. TESTER UN FICHIER SPECIFIQUE
+   cd tests/data/input/
+   python ../../../modificateur_interactif.py simple_example.py
+
+4. GENERER UN RAPPORT
+   python tests/scripts/generate_basic_report.py
+
+5. NETTOYAGE
+   python tests/scripts/cleanup.py
+
+FICHIERS IMPORTANTS:
+- tests/run_tests.py : Lanceur principal
+- tests/data/input/ : Vos fichiers Python de test
+- tests/output/ : Resultats des transformations
+- tests/config/ : Configuration
+
+AIDE:
+- Voir README.md pour plus de details
+- Utiliser --help sur les scripts
+- Consulter les logs dans output/logs/

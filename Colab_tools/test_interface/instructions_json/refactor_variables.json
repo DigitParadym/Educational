@@ -1,0 +1,17 @@
+{
+  "name": "refactor_variables_test",
+  "display_name": "Refactor Variables (Test)",
+  "description": "Renomme les variables selon les conventions",
+  "version": "1.0.0",
+  "author": "Test Suite",
+  "category": "refactoring",
+  "instructions": {
+    "rename_variables": {
+      "temp": "temporary_value",
+      "data": "dataset",
+      "result": "output_result"
+    },
+    "enforce_snake_case": true,
+    "avoid_reserved_words": true
+  }
+}

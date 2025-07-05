@@ -1,0 +1,20 @@
+{
+  "name": "optimize_imports_test",
+  "display_name": "Optimiser Imports (Test)",
+  "description": "Reorganise et optimise les imports selon PEP8",
+  "version": "1.0.0",
+  "author": "Test Suite",
+  "category": "optimization",
+  "instructions": {
+    "sort_imports": true,
+    "remove_unused": true,
+    "group_imports": {
+      "standard_library": 1,
+      "third_party": 2,
+      "local": 3
+    },
+    "add_future_imports": [
+      "from __future__ import annotations"
+    ]
+  }
+}

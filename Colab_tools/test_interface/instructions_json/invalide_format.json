@@ -1,0 +1,9 @@
+
+{
+    "name": "test_invalide",
+    "display_name": "Test Invalide",
+    "description": "JSON mal formate pour tester la gestion d'erreurs"
+    // Commentaire invalide en JSON
+    "version": "1.0.0"
+    "missing_comma": true
+}

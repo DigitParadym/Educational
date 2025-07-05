@@ -20,10 +20,11 @@ if str(current_dir) not in sys.path:
     sys.path.insert(0, str(current_dir))
 
 from base_transformer import BaseTransformer
+from core.base_transformer import BaseTransformer
 
-class JsonAiTransformer(BaseTransformer):
+class JsonAITransformer(BaseTransformer):
     """
-    Transformateur qui applique des instructions JSON générées par IA.
+    Transformer qui applique des instructions JSON générées par IA.
     Sécurisé : seules les instructions prédéfinies sont autorisées.
     """
     
@@ -352,7 +353,7 @@ def autre_fonction():
 '''
     
     # Tester la transformation
-    transformer = JsonAiTransformer()
+    transformer = JsonAITransformer()
     
     print("=== TEST TRANSFORMATION JSON-AI ===")
     print("Code original:")

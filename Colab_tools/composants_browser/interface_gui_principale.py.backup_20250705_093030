@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-Interface GUI Principale - Version Neuve Fonctionnelle
-Connexion directe au TransformationLoader - Garantie de fonctionnement
+Interface GUI Minimale mais Fonctionnelle
+Version de secours avec integration modulaire
 """
 
 import sys
@@ -11,15 +11,25 @@ import os
 from pathlib import Path
 import datetime
 import tkinter as tk
+from tkinter import filedialog
 from tkinter import ttk, filedialog, messagebox
 
-# Ajouter le repertoire parent au path
+# Ajouter le repertoire parent au path pour les imports
 current_dir = Path(__file__).parent.parent
 if str(current_dir) not in sys.path:
     sys.path.insert(0, str(current_dir))
 
+# Import du moteur modulaire
+try:
+    from modificateur_interactif import OrchestrateurAST
+    MOTEUR_DISPONIBLE = True
+    print("+ Moteur modulaire charge avec succes")
+except ImportError as e:
+    print(f"! Moteur modulaire non disponible: {e}")
+    MOTEUR_DISPONIBLE = False
+
 class InterfaceAST:
-    """Interface graphique pour les transformations AST."""
+    """Interface graphique simplifiee avec support modulaire."""
     
     def __init__(self):
         self.root = tk.Tk()
@@ -27,14 +37,54 @@ class InterfaceAST:
         self.root.geometry("800x600")
         
         self.fichiers_selectionnes = []
+        self.orchestrateur = None
         self.transformations_disponibles = []
-        self.loader = None
+        self.transformations_json = []
         
         self.creer_interface()
-        self.init_transformation_loader()
+        self.init_moteur_modulaire()
     
+    def init_moteur_modulaire(self):
+        """Initialise le moteur AST avec système modulaire - Version Corrigée."""
+        try:
+            # Import direct local
+            import sys
+            import os
+            from pathlib import Path
+            
+            # Ajouter le répertoire parent au path
+            current_dir = Path(__file__).parent.parent
+            sys.path.insert(0, str(current_dir))
+            
+            # Import direct du moteur
+            from modificateur_interactif import OrchestrateurAST
+            
+            # Créer l'instance
+            self.orchestrateur = OrchestrateurAST()
+            
+            # Tester les transformations
+            self.transformations_disponibles = self.orchestrateur.lister_transformations_modulaires()
+            
+            # Messages de debug
+            self.log_message(f"+ Moteur modulaire connecté avec succès!")
+            self.log_message(f"+ {len(self.transformations_disponibles)} transformation(s) trouvée(s)")
+            
+            # Lister les transformations trouvées
+            for t in self.transformations_disponibles:
+                self.log_message(f"  - {t['display_name']} v{t.get('version', 'N/A')}")
+            
+            # FORCER la mise à jour de la liste déroulante
+            self.root.after(100, self.update_transformations_list)
+            
+        except Exception as e:
+            self.log_message(f"X Erreur connexion moteur: {e}")
+            import traceback
+            self.log_message(f"X Détails: {traceback.format_exc()}")
+            self.orchestrateur = None
+            self.transformations_disponibles = []
     def creer_interface(self):
         """Cree l'interface utilisateur."""
+        # Frame principal
         main_frame = tk.Frame(self.root)
         main_frame.pack(fill='both', expand=True, padx=10, pady=10)
         
@@ -55,7 +105,7 @@ class InterfaceAST:
                  command=self.select_folder).pack(side='left', padx=(0, 10))
         tk.Button(buttons_frame, text="Effacer",
                  command=self.clear_selection).pack(side='left', padx=(0, 10))
-        tk.Button(buttons_frame, text="JSON", command=self.load_json).pack(side='left')
+        tk.Button(buttons_frame, text="JSON", command=self.load_json_transformation).pack(side='left')
         
         self.files_listbox = tk.Listbox(files_frame, height=4)
         self.files_listbox.pack(fill='x', padx=10, pady=(0, 10))
@@ -85,65 +135,6 @@ class InterfaceAST:
         scrollbar.pack(side="right", fill="y", pady=10, padx=(0, 10))
         
         self.log_message("=== Interface AST demarree ===")
-    
-    def init_transformation_loader(self):
-        """Initialise le TransformationLoader directement."""
-        try:
-            from core.transformation_loader import TransformationLoader
-            
-            self.loader = TransformationLoader()
-            self.log_message("+ TransformationLoader cree")
-            
-            # Recuperer les transformations
-            plugin_names = self.loader.list_transformations()
-            self.log_message(f"+ {len(plugin_names)} plugins detectes")
-            
-            # Construire la liste pour l'interface
-            self.transformations_disponibles = []
-            for plugin_name in plugin_names:
-                transformer = self.loader.get_transformation(plugin_name)
-                if transformer:
-                    metadata = transformer.get_metadata()
-                    self.transformations_disponibles.append({
-                        'name': plugin_name,
-                        'display_name': metadata.get('name', plugin_name),
-                        'description': metadata.get('description', 'Transformation'),
-                        'version': metadata.get('version', '1.0')
-                    })
-                    self.log_message(f"  - {metadata.get('name', plugin_name)} v{metadata.get('version', '1.0')}")
-            
-            self.log_message(f"+ {len(self.transformations_disponibles)} transformations disponibles")
-            
-            # Mettre a jour la liste
-            self.update_transformations_list()
-            
-        except Exception as e:
-            self.log_message(f"X Erreur TransformationLoader: {e}")
-            import traceback
-            self.log_message(f"X Details: {traceback.format_exc()}")
-            self.transformations_disponibles = []
-    
-    def update_transformations_list(self):
-        """Met a jour la liste des transformations."""
-        try:
-            values = []
-            if self.transformations_disponibles:
-                for t in self.transformations_disponibles:
-                    display_text = f"{t['display_name']} - {t['description']}"
-                    values.append(display_text)
-                
-                self.log_message(f"+ Liste mise a jour: {len(values)} transformations")
-            else:
-                values = ["Aucune transformation disponible"]
-                self.log_message("! Aucune transformation disponible")
-            
-            self.transformation_combo['values'] = values
-            if values and "Aucune" not in values[0]:
-                self.transformation_combo.current(0)
-                self.log_message("+ Premiere transformation selectionnee")
-        
-        except Exception as e:
-            self.log_message(f"X Erreur mise a jour liste: {e}")
     
     def select_files(self):
         """Selectionne des fichiers."""
@@ -181,29 +172,69 @@ class InterfaceAST:
         self.update_files_display()
         self.log_message("+ Selection effacee")
     
-    def load_json(self):
-        """Charge un fichier JSON."""
-        fichier_json = filedialog.askopenfilename(
-            title="Selectionner fichier JSON",
-            filetypes=[("Fichiers JSON", "*.json"), ("Tous", "*.*")]
-        )
-        if fichier_json:
-            self.log_message(f"+ JSON charge: {os.path.basename(fichier_json)}")
-    
+
+    def load_json_transformation(self):
+        """Charge une transformation depuis un fichier JSON."""
+        import json
+        try:
+            fichier_json = filedialog.askopenfilename(
+                title="Selectionner transformation JSON",
+                filetypes=[("Fichiers JSON", "*.json"), ("Tous", "*.*")]
+            )
+            
+            if not fichier_json:
+                return
+            
+            with open(fichier_json, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # Verifier les cles requises
+            required = ['name', 'display_name', 'description']
+            if not all(key in data for key in required):
+                self.log_message("ERREUR - JSON invalide")
+                return
+            
+            # Ajouter aux transformations
+            if not hasattr(self, 'transformations_json'):
+                self.transformations_json = []
+            
+            self.transformations_json.append(data)
+            
+            if not self.transformations_disponibles:
+                self.transformations_disponibles = []
+            
+            self.transformations_disponibles.append(data)
+            self.update_transformations_list()
+            
+            self.log_message(f"JSON charge: {data['display_name']}")
+            
+        except Exception as e:
+            self.log_message(f"ERREUR JSON: {e}")
+
     def update_files_display(self):
         """Met a jour l'affichage des fichiers."""
         self.files_listbox.delete(0, tk.END)
         for fichier in self.fichiers_selectionnes:
             self.files_listbox.insert(tk.END, os.path.basename(fichier))
     
+    def update_transformations_list(self):
+        """Met a jour la liste des transformations."""
+        values = []
+        if self.transformations_disponibles:
+            values = [f"{t['display_name']} - {t['description']}" for t in self.transformations_disponibles]
+        
+        self.transformation_combo['values'] = values
+        if values:
+            self.transformation_combo.current(0)
+    
     def apply_transformation(self):
-        """Applique la transformation selectionnee."""
+        """Applique la transformation."""
         if not self.fichiers_selectionnes:
             self.log_message("X Aucun fichier selectionne")
             return
         
-        if not self.loader or not self.transformations_disponibles:
-            self.log_message("X Aucune transformation disponible")
+        if not self.orchestrateur:
+            self.log_message("X Moteur modulaire non disponible")
             return
         
         selection = self.transformation_combo.current()
@@ -217,7 +248,7 @@ class InterfaceAST:
         self.log_message("=== DEBUT TRANSFORMATION ===")
         self.log_message(f"Transformation: {transformation['display_name']}")
         
-        # Creer dossier de sortie
+        # Dossier de sortie
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         dossier_sortie = f"transformations_gui_{timestamp}"
         os.makedirs(dossier_sortie, exist_ok=True)
@@ -229,27 +260,17 @@ class InterfaceAST:
             self.log_message(f"[{i}/{len(self.fichiers_selectionnes)}] {os.path.basename(fichier_source)}")
             
             try:
-                # Lire le fichier source
-                with open(fichier_source, 'r', encoding='utf-8') as f:
-                    code_source = f.read()
+                nom_base = os.path.splitext(os.path.basename(fichier_source))[0]
+                fichier_sortie = os.path.join(dossier_sortie, f"{nom_base}_{transformation_name}.py")
                 
-                # Appliquer la transformation
-                transformer = self.loader.get_transformation(transformation_name)
-                if transformer and transformer.can_transform(code_source):
-                    code_transforme = transformer.transform(code_source)
-                    
-                    # Sauvegarder
-                    nom_base = os.path.splitext(os.path.basename(fichier_source))[0]
-                    fichier_sortie = os.path.join(dossier_sortie, f"{nom_base}_{transformation_name}.py")
-                    
-                    with open(fichier_sortie, 'w', encoding='utf-8') as f:
-                        f.write(code_transforme)
-                    
+                if self.orchestrateur.appliquer_transformation_modulaire(
+                    fichier_source, fichier_sortie, transformation_name
+                ):
                     succes += 1
                     self.log_message("  + Reussi")
                 else:
                     echecs += 1
-                    self.log_message("  - Non applicable")
+                    self.log_message("  X Echec")
                     
             except Exception as e:
                 echecs += 1
@@ -265,9 +286,32 @@ class InterfaceAST:
         full_message = f"[{timestamp}] {message}\n"
         self.console_text.insert(tk.END, full_message)
         self.console_text.see(tk.END)
-        self.root.update_idletasks()
         print(message)
     
+
+    def update_transformations_list(self):
+        """Met à jour la liste déroulante des transformations - Version Forcée."""
+        if not hasattr(self, 'transformation_combo'):
+            return
+        
+        values = []
+        if hasattr(self, 'transformations_disponibles') and self.transformations_disponibles:
+            for t in self.transformations_disponibles:
+                display_text = f"{t['display_name']} - {t['description']}"
+                values.append(display_text)
+            
+            self.log_message(f"+ Mise à jour liste: {len(values)} transformation(s)")
+        else:
+            self.log_message("! Aucune transformation pour la liste")
+        
+        # Mettre à jour la combobox
+        self.transformation_combo['values'] = values
+        if values:
+            self.transformation_combo.current(0)
+            self.log_message(f"+ Liste mise à jour: {values[0]}")
+        else:
+            self.log_message("X Liste vide après mise à jour")
+
     def run(self):
         """Lance l'interface."""
         try:
@@ -278,14 +322,10 @@ class InterfaceAST:
             print(f"Erreur: {e}")
             return False
 
-def main():
-    """Point d'entree principal."""
+if __name__ == '__main__':
     try:
         app = InterfaceAST()
         app.run()
     except Exception as e:
         print(f'Erreur: {e}')
         input('Appuyez sur Entree pour fermer...')
-
-if __name__ == '__main__':
-    main()

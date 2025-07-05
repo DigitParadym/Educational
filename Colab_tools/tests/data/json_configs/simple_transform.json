@@ -1,0 +1,11 @@
+{
+  "transformations": [
+    {
+      "action": "add_import",
+      "module": "logging"
+    },
+    {
+      "action": "convert_print_to_logging"
+    }
+  ]
+}

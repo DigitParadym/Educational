@@ -1,0 +1,20 @@
+{
+  "name": "add_logging_test",
+  "display_name": "Ajouter Logging (Test)",
+  "description": "Ajoute des logs automatiquement dans les fonctions",
+  "version": "1.0.0",
+  "author": "Test Suite",
+  "category": "logging",
+  "instructions": {
+    "add_imports": [
+      "import logging"
+    ],
+    "add_to_functions": {
+      "start": "logging.info(f'Debut de {function_name}')",
+      "end": "logging.info(f'Fin de {function_name}')"
+    },
+    "target_functions": [
+      "all"
+    ]
+  }
+}

@@ -17,10 +17,11 @@ if str(current_dir) not in sys.path:
     sys.path.insert(0, str(current_dir))
 
 from base_transformer import BaseTransformer
+from core.base_transformer import BaseTransformer
 
-class AddDocstringsTransformer(BaseTransformer):
+class AddDocstringsTransform(BaseTransformer):
     """
-    Transformateur qui ajoute des docstrings par défaut aux fonctions
+    Transformer qui ajoute des docstrings par défaut aux fonctions
     et méthodes qui n'en ont pas.
     """
     
